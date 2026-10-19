@@ -1,0 +1,373 @@
+/* ───────── Generic dialog bits ───────── */
+.dlg-pad {
+  padding: 22px 22px 20px;
+}
+.dlg-pad.grow {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dlg-h {
+  margin: 0 0 14px;
+  font-size: 20px;
+  font-weight: 700;
+}
+.dlg-p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+.q-dialog-footer {
+  height: 50px;
+  padding: 0 13px;
+  gap: 13px;
+  background: var(--surface-2);
+}
+.q-btn.dlg-btn {
+  height: 26px;
+  padding: 0 14px;
+  font-size: 14px;
+}
+.q-btn.dlg-btn.danger-fill {
+  background: var(--danger);
+}
+
+/* ───────── New Notebook ───────── */
+.nb-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.nb-left {
+  width: 229px;
+  flex-shrink: 0;
+  padding: 19px 19px 0;
+  background: var(--content-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.nb-label {
+  font-size: 14px;
+  line-height: 17px;
+  font-weight: 500;
+  margin-top: 16px;
+}
+.nb-label:first-child {
+  margin-top: 0;
+}
+.nb-title-input {
+  height: 35px;
+  margin-top: 3px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--surface-2);
+  font-size: 15px;
+  font-weight: 400;
+}
+.nb-title-input::placeholder {
+  color: var(--text-3);
+}
+.nb-title-input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+.nb-left > .nb-label:nth-of-type(2) {
+  margin-top: 25px;
+}
+.nb-cover,
+.nb-paper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: var(--text-1);
+}
+.nb-cover {
+  margin-top: 8px;
+  padding: 0;
+}
+.nb-cover-art {
+  display: block;
+  width: 100px;
+  height: 128px;
+  border-radius: 2px 6px 6px 2px;
+  overflow: hidden;
+}
+.nb-cover-art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.nb-cover-name,
+.nb-paper-name {
+  margin-top: 5px;
+  font-size: 14px;
+  line-height: 17px;
+}
+.nb-cover.on,
+.nb-paper.on {
+  border-color: var(--primary);
+}
+.nb-paper {
+  margin-top: 3px;
+  padding: 8px 0 4px;
+  background: var(--content-bg);
+}
+.paper-preview {
+  display: block;
+  overflow: hidden;
+}
+.paper-preview svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nb-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-2);
+}
+.nb-pills {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 45px;
+  padding: 0 0 0 26px;
+  border-bottom: 1px solid var(--divider);
+  flex-shrink: 0;
+}
+.nb-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 29px;
+  padding: 0 10px;
+  border: 1px solid var(--divider);
+  border-radius: 999px;
+  background: var(--content-bg);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.nb-pill:hover,
+.nb-pill.open {
+  background: var(--hover-card);
+}
+.swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(128, 128, 128, 0.5);
+}
+.nb-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 17px;
+}
+.nb-section {
+  margin-bottom: 28px;
+}
+.nb-section-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 25px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.nb-section-head.static {
+  padding: 8px 0;
+  height: auto;
+}
+.nb-tri {
+  width: 0;
+  height: 0;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+  border-top: 6px solid currentColor;
+  margin-right: 2px;
+}
+.nb-tri.closed {
+  transform: rotate(-90deg);
+}
+.nb-row {
+  display: flex;
+  gap: 0;
+  margin-top: 8px;
+  padding: 0 25px 8px;
+  overflow-x: auto;
+  align-items: flex-start;
+}
+.nb-row::-webkit-scrollbar {
+  height: 6px;
+}
+.paper-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 94px;
+  color: var(--text-2);
+}
+.paper-tile-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 85px;
+  height: 106px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+}
+.paper-tile:hover .paper-tile-box {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.paper-tile.on .paper-tile-box {
+  border-color: var(--primary);
+}
+.paper-tile.on {
+  color: var(--primary);
+}
+.paper-tile-name {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 17.5px;
+  text-align: center;
+}
+.cover-preview {
+  display: block;
+  border-radius: 2px 5px 5px 2px;
+  overflow: hidden;
+}
+.cover-preview svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* move / cover dialogs */
+.mv-path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.mv-path button:hover {
+  color: var(--text-1);
+}
+.mv-path span {
+  display: inline-flex;
+  align-items: center;
+}
+.mv-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border: 1px solid var(--divider);
+  border-radius: 10px;
+  padding: 4px;
+}
+.mv-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  text-align: left;
+}
+.mv-row:hover {
+  background: var(--hover-card);
+}
+.mv-row.on {
+  background: var(--nav-selected-bg);
+}
+.mv-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mv-open {
+  color: var(--text-2);
+}
+.mv-empty {
+  margin: 12px 10px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+.cv-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.cv-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding-bottom: 12px;
+}
+
+/* ───────── Editor placeholder & kit page ───────── */
+.editor-ph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  background: var(--content-bg);
+  text-align: center;
+  color: var(--text-2);
+}
+.editor-ph h2 {
+  margin: 8px 0 0;
+  font-size: 24px;
+  color: var(--text-1);
+}
+.editor-ph p {
+  margin: 0 0 12px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+.kit-page {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 32px 60px;
+  background: var(--content-bg);
+}
+.kit-page h1 {
+  margin: 0 0 16px;
+  font-size: 28px;
+}
+.kit-block {
+  margin-bottom: 22px;
+}
+.kit-block h3 {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.kit-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}

@@ -1,0 +1,59 @@
+{
+  "name": "quillnote",
+  "productName": "Quillnote",
+  "version": "0.2.0",
+  "description": "Quillnote - handwriting and note-taking for desktop",
+  "main": "./out/main/index.js",
+  "author": "Quillnote",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "dev": "electron-vite dev",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "build": "npm run typecheck && electron-vite build",
+    "start": "electron-vite preview",
+    "shots": "node scripts/shoot.mjs",
+    "dist:win": "npm run build && electron-builder --win --x64 --publish never",
+    "dist:mac": "npm run build && electron-builder --mac --publish never"
+  },
+  "build": {
+    "appId": "app.quillnote.desktop",
+    "productName": "Quillnote",
+    "directories": { "output": "release" },
+    "files": ["out/**/*", "package.json"],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.png",
+      "artifactName": "Quillnote-Setup-${version}.${ext}"
+    },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true },
+    "mac": {
+      "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }],
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.png",
+      "identity": null,
+      "artifactName": "Quillnote-${version}-${arch}.${ext}"
+    }
+  },
+  "dependencies": {
+    "@fontsource-variable/figtree": "^5.3.0",
+    "fflate": "^0.8.3",
+    "lucide-react": "^1.59.0",
+    "pdf-lib": "^1.17.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^6.1.2",
+    "electron": "^44.9.0",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^6.0.0",
+    "playwright-core": "^1.64.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4"
+  }
+}

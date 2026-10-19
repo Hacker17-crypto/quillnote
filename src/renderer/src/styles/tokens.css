@@ -1,0 +1,89 @@
+/* Quillnote design tokens (see spec 01-design.md). Dark is the default theme. */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --caption-bg: #f3f3f3;
+  --caption-fg: #6b6b6b;
+  --app-titlebar: #000000;
+  --sidebar-bg: #2e2b2b;
+  --content-bg: #1e1b1b;
+  --surface-2: #2b2828;
+  --surface-3: #2e2b2b;
+  --divider: #302d2d;
+  --hover-card: #2a2727;
+  --select-card: #1b2c3b;
+  --nav-selected-bg: #20325f;
+  --accent-cyan: #81e3fa;
+  --primary: #0c8cf3;
+  --primary-hover: #2a9bf5;
+  --editor-tabbar: #20325f;
+  --editor-toolbar: #294c7f;
+  --tool-selected-bg: #c9d2df;
+  --subtool-selected: #2e7385;
+  --slider-fill: #86c7f9;
+  --danger: #f2504b;
+  --success: #3ccb7f;
+  --badge-new-bg: #b6c174;
+  --badge-new-fg: #1e1b1b;
+  --badge-beta-bg: #cbc8db;
+  --badge-beta-fg: #1e1b1b;
+  --text-1: #ffffff;
+  --text-2: #b7b4b4;
+  --text-3: #8a8686;
+  --tab-dim: #cecdcd;
+  --scrim: rgba(0, 0, 0, 0.55);
+  --menu-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --ai-gradient: linear-gradient(135deg, #7fd6f7, #5b8cff);
+  --upsell-card: #4fc3de;
+  --paper-yellow: #f8f7e9;
+  --paper-white: #ffffff;
+  --grid-line: #e3e2d5;
+  --cover-tan: #b09f86;
+  --input-bg: #2b2828;
+  --input-border: #3a3636;
+  --skeleton-a: #2a2727;
+  --skeleton-b: #353131;
+
+  --radius-menu: 12px;
+  --radius-dialog: 18px;
+  --radius-nav: 8px;
+  --radius-thumb: 6px;
+  --caption-h: 22px;
+  --strip-h: 38px;
+  --sidebar-w: 196px;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --caption-bg: #f3f3f3;
+  --caption-fg: #4a4a4a;
+  --app-titlebar: #dfe3ea;
+  --sidebar-bg: #f1f2f5;
+  --content-bg: #ffffff;
+  --surface-2: #f4f5f8;
+  --surface-3: #eceef3;
+  --divider: #e3e5ea;
+  --hover-card: #f1f2f6;
+  --select-card: #dfeefb;
+  --nav-selected-bg: #d7e4fb;
+  --accent-cyan: #1d8fd1;
+  --primary: #0c7be0;
+  --primary-hover: #2a8cf0;
+  --editor-tabbar: #dbe4f4;
+  --editor-toolbar: #3f6cb0;
+  --tool-selected-bg: #e6ecf6;
+  --subtool-selected: #2e7385;
+  --slider-fill: #3b9bf0;
+  --danger: #e03a35;
+  --success: #1ea663;
+  --text-1: #1b1d22;
+  --text-2: #565b66;
+  --text-3: #8a8f9b;
+  --tab-dim: #565b66;
+  --scrim: rgba(20, 24, 33, 0.35);
+  --menu-shadow: 0 12px 32px rgba(30, 40, 60, 0.18);
+  --input-bg: #ffffff;
+  --input-border: #d4d8e0;
+  --skeleton-a: #eceef3;
+  --skeleton-b: #f6f7fa;
+}

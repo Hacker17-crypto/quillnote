@@ -1,0 +1,577 @@
+/* ───────── App shell ───────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--content-bg);
+}
+.app-main {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.app-main > * {
+  flex: 1;
+  min-width: 0;
+}
+[hidden] {
+  display: none !important;
+}
+
+/* Windows caption row (frameless). */
+.caption {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  height: var(--caption-h);
+  flex-shrink: 0;
+  background: var(--caption-bg);
+  color: var(--caption-fg);
+  font-size: 12px;
+  font-weight: 400;
+}
+.caption-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-left: 9px;
+  color: #444;
+}
+.caption-controls {
+  display: flex;
+}
+.caption-controls button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  color: #333;
+}
+.caption-controls button:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+.caption-controls button.close:hover {
+  background: #e81123;
+  color: #fff;
+}
+
+/* ───────── Tab strip ───────── */
+.tabstrip {
+  display: flex;
+  align-items: flex-end;
+  height: var(--strip-h);
+  flex-shrink: 0;
+  background: var(--app-titlebar);
+}
+.tabstrip.mac {
+  padding-left: 78px;
+}
+.tabstrip.editing {
+  background: var(--editor-tabbar);
+}
+.tab-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 36px;
+  border-radius: 8px 8px 0 0;
+  color: var(--text-1);
+}
+.tab-home.on {
+  background: var(--sidebar-bg);
+}
+.tabstrip.editing .tab-home.on {
+  background: var(--editor-toolbar);
+}
+.tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 240px;
+  max-width: 240px;
+  height: 100%;
+  padding: 0 12px 0 24px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+  color: var(--text-1);
+  cursor: pointer;
+}
+.tab.dim {
+  color: var(--tab-dim);
+}
+.tab.on {
+  background: var(--editor-toolbar);
+}
+.tab-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tab-x {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: #8f8f8f;
+}
+.tab-x:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+/* ───────── Library layout ───────── */
+.lib-layout {
+  display: flex;
+  width: 100%;
+  min-height: 0;
+}
+.lib-sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  overflow: hidden;
+}
+.wordmark {
+  margin: 62px 0 0 18px;
+  font-size: 34px;
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  line-height: 36px;
+  white-space: nowrap;
+}
+.nav-list {
+  margin: 20px 13px 0 12px;
+}
+.nav-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 34px;
+  padding: 0 9px;
+  border-radius: var(--radius-nav);
+  color: var(--text-1);
+  text-align: left;
+  margin-bottom: 1px;
+}
+.nav-row.tall {
+  min-height: 45px;
+}
+.nav-row:hover:not(.on) {
+  background: rgba(255, 255, 255, 0.05);
+}
+.nav-row.on {
+  background: var(--nav-selected-bg);
+}
+.nav-row.on .nav-icon {
+  color: var(--accent-cyan);
+}
+.nav-icon {
+  display: flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+}
+.nav-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.nav-label {
+  font-size: 15px;
+  line-height: 18px;
+}
+.nav-caption {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 400;
+  color: var(--text-1);
+}
+.nav-divider {
+  height: 1px;
+  margin: 6px 0;
+  background: var(--divider);
+}
+
+.lib-main {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--content-bg);
+}
+.lib-main.filedrop::after {
+  content: 'Drop to import';
+  position: absolute;
+  inset: 8px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--primary);
+  border-radius: 14px;
+  background: rgba(12, 140, 243, 0.08);
+  font-size: 22px;
+  font-weight: 600;
+  pointer-events: none;
+}
+.lib-top {
+  position: absolute;
+  top: 13px;
+  right: 14px;
+  display: flex;
+  gap: 4px;
+}
+.lib-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 62px;
+  margin: 47px 20px 0;
+  border-bottom: 1px solid var(--divider);
+  flex-shrink: 0;
+}
+.lib-title-h {
+  margin: 0 0 0 1px;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 40px;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.lib-title-h.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.lib-title-h.crumbs button {
+  font-weight: 700;
+  color: var(--text-2);
+}
+.lib-title-h.crumbs button:hover {
+  color: var(--text-1);
+}
+.crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.lib-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.lib-actions .q-btn {
+  height: 27px;
+  padding: 0 10px;
+  font-size: 14px;
+  gap: 5px;
+}
+.lib-actions .new-btn {
+  padding: 0 9px 0 8px;
+}
+.lib-act-sep {
+  width: 1px;
+  height: 27px;
+  margin: 0 4px;
+  background: var(--divider);
+}
+.lib-search {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 10px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.lib-search input {
+  flex: 1;
+  height: 100%;
+  background: none;
+  border: 0;
+  font-size: 18px;
+  font-weight: 400;
+}
+.lib-search input:focus {
+  outline: none;
+}
+.lib-search-x {
+  display: flex;
+  color: var(--text-2);
+}
+
+/* select mode toolbar */
+.lib-head.select {
+  justify-content: flex-start;
+  gap: 18px;
+  padding-left: 0;
+}
+.sel-all,
+.sel-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  font-size: 15px;
+  color: var(--text-1);
+}
+.sel-act {
+  color: var(--text-1);
+}
+.sel-act:disabled {
+  color: #5d5959;
+  cursor: default;
+}
+.sel-radio {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid #4c4848;
+  background: #262323;
+}
+.sel-radio.on {
+  background: var(--primary);
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 4px #262323;
+}
+
+/* ───────── Grid & cards ───────── */
+.lib-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0 20px 0 0;
+  padding: 57px 8px 40px 8px;
+}
+.lib-note {
+  margin: -6px 0 14px 2px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-2);
+}
+.lib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 125px);
+  gap: 18px 16px;
+  align-content: start;
+  min-height: 100%;
+}
+.lib-body:has(.q-empty) {
+  overflow: hidden;
+  padding: 0;
+}
+.lib-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 125px;
+  padding-bottom: 6px;
+  border-radius: 8px;
+  cursor: default;
+}
+.lib-card:hover:not(.focused) {
+  background: var(--hover-card);
+}
+.lib-card.focused {
+  background: var(--select-card);
+}
+.lib-card.drop {
+  outline: 2px solid var(--primary);
+}
+.lib-card.in-trash .lib-thumb-wrap {
+  opacity: 0.75;
+}
+.lib-thumb-wrap {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 125px;
+  height: 122px;
+}
+.lib-thumb-slot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.lib-thumb {
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.lib-thumb svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.lib-thumb.cover {
+  border-radius: 3px 8px 8px 3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+.lib-thumb.page {
+  border-radius: var(--radius-thumb);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.lib-thumb.page img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lib-thumb.folder {
+  overflow: visible;
+}
+.lib-thumb.board {
+  border-radius: 8px 8px 4px 4px;
+  overflow: visible;
+  background: #fff;
+  border: 2px solid #dcdcdc;
+}
+.board-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.board-tray {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -6px;
+  height: 8px;
+  border-radius: 0 0 8px 8px;
+  background: #b9b9b9;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 18px;
+}
+.board-tray span {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: #ececec;
+}
+.lib-star {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  display: flex;
+  padding: 2px;
+  color: rgba(120, 120, 120, 0.85);
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.7));
+}
+.lib-star:hover {
+  color: #555;
+}
+.lib-star.on {
+  color: #fff;
+  filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.55));
+}
+.lib-check {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -12px 0 0 -12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  background: rgba(30, 27, 27, 0.55);
+  color: #fff;
+}
+.lib-check.on {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.lib-title-row {
+  position: relative;
+  width: 100%;
+  margin-top: 12px;
+  padding: 0 24px;
+  text-align: center;
+}
+.lib-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 17.5px;
+  overflow-wrap: anywhere;
+}
+.lib-chevron {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  display: flex;
+  padding: 3px;
+  margin-top: -11px;
+  border-radius: 50%;
+  color: var(--text-1);
+}
+.lib-chevron:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.lib-date {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 14px;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+.lib-grid.list {
+  grid-template-columns: 1fr;
+  gap: 2px;
+}
+.lib-grid.list .lib-card {
+  flex-direction: row;
+  width: 100%;
+  height: 56px;
+  padding: 0 12px;
+  gap: 14px;
+}
+.lib-grid.list .lib-thumb-wrap {
+  width: 40px;
+  height: 46px;
+  overflow: hidden;
+  transform: none;
+}
+.lib-grid.list .lib-thumb-wrap > * {
+  transform: scale(0.34);
+  transform-origin: center bottom;
+}
+.lib-grid.list .lib-title-row {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+.lib-grid.list .lib-date {
+  margin: 0 40px 0 0;
+}
+.lib-grid.list .lib-chevron {
+  right: 0;
+}
