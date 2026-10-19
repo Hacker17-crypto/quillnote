@@ -30,6 +30,8 @@ export interface ToolPrefs {
   laser: { mode: 'dot' | 'trail'; color: string }
   ruler: boolean
   drawHold: boolean
+  /** Snap moved objects to page centre lines and other objects' edges. */
+  align: boolean
   recent: string[]
 }
 
@@ -56,6 +58,7 @@ export const DEFAULT_TOOLS: ToolPrefs = {
   laser: { mode: 'trail', color: '#FF3B30' },
   ruler: false,
   drawHold: true,
+  align: true,
   recent: []
 }
 
@@ -101,8 +104,8 @@ export function activeSwatch(s: ToolPrefs = useTools.getState()): Swatches {
 }
 
 export function snapshotPrefs(s: ToolsState): ToolPrefs {
-  const { tool, penKind, penType, pen, highlighter, tape, shape, eraser, lasso, text, sticky, laser, ruler, drawHold, recent } = s
-  return { tool, penKind, penType, pen, highlighter, tape, shape, eraser, lasso, text, sticky, laser, ruler, drawHold, recent }
+  const { tool, penKind, penType, pen, highlighter, tape, shape, eraser, lasso, text, sticky, laser, ruler, drawHold, align, recent } = s
+  return { tool, penKind, penType, pen, highlighter, tape, shape, eraser, lasso, text, sticky, laser, ruler, drawHold, align, recent }
 }
 
 let saveTimer = 0

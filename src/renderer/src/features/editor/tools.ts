@@ -488,21 +488,68 @@ function lassoGesture(ctx: ToolCtx, e: PointerEvent): Gesture | null {
 function moveGesture(ctx: ToolCtx, ids: string[], toPage: (e: PointerEvent) => Pt, start: [number, number]): Gesture {
   const set = new Set(ids)
   const before = objectsOf(ctx)
+  const moving = before.filter((o) => set.has(o.id))
+  const b0 = unionBounds(moving)
+  const page = session(ctx.docId)?.doc.pages.find((p) => p.id === ctx.pageId)
+  // snap targets: page centre lines and the edges / centres of every other object
+  const xs: number[] = []
+  const ys: number[] = []
+  if (page && !page.infinite) {
+    xs.push(page.width / 2)
+    ys.push(page.height / 2)
+  }
+  for (const o of before) {
+    if (set.has(o.id)) continue
+    const b = bounds(o)
+    xs.push(b.x, b.x + b.w / 2, b.x + b.w)
+    ys.push(b.y, b.y + b.h / 2, b.y + b.h)
+  }
+  const guides = document.createElementNS(SVG_NS, 'g')
+  ctx.live.appendChild(guides)
   let moved = false
   useEditor.getState().beginGesture(ctx.docId)
+  const snap = (v: number[], cands: number[]): { d: number; at: number } | null => {
+    const tol = 5 / ctx.scale
+    let best: { d: number; at: number } | null = null
+    for (const c of cands)
+      for (const x of v) {
+        const d = c - x
+        if (Math.abs(d) <= tol && (!best || Math.abs(d) < Math.abs(best.d))) best = { d, at: c }
+      }
+    return best
+  }
   return {
     move(ev) {
       const [x, y] = toPage(ev)
-      const dx = x - start[0]
-      const dy = y - start[1]
+      let dx = x - start[0]
+      let dy = y - start[1]
       if (!moved && Math.hypot(dx, dy) * ctx.scale < 3) return
       moved = true
+      guides.innerHTML = ''
+      if (b0 && useTools.getState().align && !ev.altKey) {
+        const bx = b0.x + dx
+        const by = b0.y + dy
+        const sx = snap([bx, bx + b0.w / 2, bx + b0.w], xs)
+        const sy = snap([by, by + b0.h / 2, by + b0.h], ys)
+        const big = 100000
+        const line = (d: string): string => `<path d="${d}" stroke="#D6409F" stroke-width="${1 / ctx.scale}" stroke-dasharray="${4 / ctx.scale} ${3 / ctx.scale}"/>`
+        if (sx) {
+          dx += sx.d
+          guides.innerHTML += line(`M${sx.at} ${-big}V${big}`)
+        }
+        if (sy) {
+          dy += sy.d
+          guides.innerHTML += line(`M${-big} ${sy.at}H${big}`)
+        }
+      }
       edit(ctx, () => before.map((o) => (set.has(o.id) ? translate(o, dx, dy) : o)), false)
     },
     up() {
+      guides.remove()
       useEditor.getState().endGesture(ctx.docId)
     },
     cancel() {
+      guides.remove()
       edit(ctx, () => before, false)
       useEditor.getState().endGesture(ctx.docId)
     }

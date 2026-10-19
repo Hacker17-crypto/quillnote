@@ -13,6 +13,8 @@ interface TabsState {
   close: (id: string) => void
   activate: (id: string) => void
   retitle: (id: string, title: string) => void
+  /** Move tab `from` to the position of tab `to`. */
+  reorder: (from: string, to: string) => void
   /** Drop tabs whose documents no longer exist or were trashed. */
   prune: (liveIds: Set<string>) => void
 }
@@ -31,6 +33,16 @@ export const useTabs = create<TabsState>((set) => ({
     }),
   activate: (active) => set({ active }),
   retitle: (id, title) => set((s) => ({ tabs: s.tabs.map((t) => (t.id === id ? { ...t, title } : t)) })),
+  reorder: (from, to) =>
+    set((s) => {
+      const tabs = s.tabs.slice()
+      const i = tabs.findIndex((t) => t.id === from)
+      const j = tabs.findIndex((t) => t.id === to)
+      if (i < 0 || j < 0) return s
+      const [m] = tabs.splice(i, 1)
+      tabs.splice(j, 0, m)
+      return { tabs }
+    }),
   prune: (liveIds) =>
     set((s) => {
       const tabs = s.tabs.filter((t) => liveIds.has(t.id))
