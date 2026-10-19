@@ -11,7 +11,7 @@ import { DEFAULT_PAPER } from '@shared/paper'
 import type { ImportResult, PageData, PaperSpec, QuillDoc } from '@shared/types'
 import type { AssetFile, LibraryStorage } from './storage'
 
-const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.jfif', '.gif', '.webp', '.bmp', '.svg'])
+export const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.jfif', '.gif', '.webp', '.bmp', '.svg'])
 const OFFICE_EXT = new Set(['.docx', '.doc', '.pptx', '.ppt', '.odt', '.odp', '.rtf'])
 
 export const IMPORT_FILTERS = [
@@ -89,7 +89,7 @@ export class Importer {
     const bytes = await fs.readFile(path)
     const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true, updateMetadata: false })
     const pages: PageData[] = pdf.getPages().map((pg, i) => {
-      const { width, height } = pg.getSize()
+      const { width, height } = pdfPageSize(pg)
       return {
         id: uid(), width, height, paper: blankPaper,
         background: { type: 'pdf', pdfPage: i }, objects: []
@@ -140,7 +140,14 @@ export class Importer {
 }
 
 // ───────────────────────── helpers ─────────────────────────
-function imageSize(bytes: Uint8Array, ext: string, path: string): { width: number; height: number } {
+/** Displayed page size: honours /Rotate the same way pdf.js does. */
+export function pdfPageSize(pg: { getSize(): { width: number; height: number }; getRotation(): { angle: number } }): { width: number; height: number } {
+  const { width, height } = pg.getSize()
+  const turned = Math.abs(pg.getRotation().angle) % 180 === 90
+  return turned ? { width: height, height: width } : { width, height }
+}
+
+export function imageSize(bytes: Uint8Array, ext: string, path: string): { width: number; height: number } {
   const buf = Buffer.from(bytes)
   if (ext === '.gif' && buf.length > 10) return { width: buf.readUInt16LE(6), height: buf.readUInt16LE(8) }
   if (ext === '.webp' && buf.length > 30 && buf.toString('ascii', 0, 4) === 'RIFF') {

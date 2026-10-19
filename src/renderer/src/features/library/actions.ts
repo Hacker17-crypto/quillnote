@@ -49,8 +49,11 @@ export async function importFromFolder(hint?: string): Promise<void> {
 }
 
 export async function exportAs(item: LibraryItem, format: 'pdf' | 'quill'): Promise<void> {
-  const ui = useUi.getState()
-  const res = format === 'pdf' ? await window.quill.library.exportPdf(item.id) : await window.quill.library.exportQuill(item.id)
-  if (res.ok) ui.toast(`Exported ${item.title}`, res.path ? { label: 'Show', run: () => window.quill.library.showInFolder(item.id) } : undefined)
-  else if (res.error) ui.toast(res.error)
+  const ex = await import('../editor/exporting')
+  try {
+    if (format === 'pdf') await ex.exportPdf(item.id)
+    else await ex.exportQuill(item.id)
+  } catch (e) {
+    useUi.getState().toast(`Export failed: ${e instanceof Error ? e.message : 'unknown error'}`)
+  }
 }

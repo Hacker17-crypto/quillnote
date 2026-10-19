@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
-import type { QuillApi } from '@shared/api'
+import type { AiEvent, QuillApi } from '@shared/api'
 
 const call = <T>(channel: string, ...args: unknown[]): Promise<T> => ipcRenderer.invoke(channel, ...args)
 
@@ -36,7 +36,6 @@ const api: QuillApi = {
     setCover: (id, cover) => call('library:setCover', id, cover),
     readDoc: (id) => call('library:readDoc', id),
     saveDoc: (doc) => call('library:saveDoc', doc),
-    exportPdf: (id) => call('library:exportPdf', id),
     exportQuill: (id) => call('library:exportQuill', id),
     showInFolder: (id) => ipcRenderer.send('library:showInFolder', id),
     pickImport: (parentId, mode) => call('library:pickImport', parentId, mode),
@@ -45,9 +44,43 @@ const api: QuillApi = {
   },
   pathForFile: (file) => webUtils.getPathForFile(file),
   claude: { status: () => call('claude:status') },
+  doc: {
+    writeAsset: (id, name, data) => call('doc:writeAsset', id, name, data),
+    pickImages: (id) => call('doc:pickImages', id),
+    addImageFromPath: (id, path) => call('doc:addImageFromPath', id, path),
+    pickPdf: (id) => call('doc:pickPdf', id)
+  },
+  export: {
+    pdf: (payload) => call('export:pdf', payload),
+    print: (payload) => call('export:print', payload),
+    images: (title, files) => call('export:images', title, files),
+    markdown: (title, text) => call('export:markdown', title, text),
+    showFile: (path) => ipcRenderer.send('export:showFile', path)
+  },
+  ai: {
+    status: () => call('claude:status'),
+    ask: (req) => call('ai:ask', req),
+    cancel: (id) => ipcRenderer.send('ai:cancel', id),
+    onEvent: (cb) => {
+      const listener = (_: unknown, e: AiEvent): void => cb(e)
+      ipcRenderer.on('ai:event', listener)
+      return () => ipcRenderer.removeListener('ai:event', listener)
+    }
+  },
+  elements: {
+    get: () => call('elements:get'),
+    set: (cols) => call('elements:set', cols)
+  },
   app: {
-    version: '0.2.0',
-    openExternal: (url) => ipcRenderer.send('app:openExternal', url)
+    version: __APP_VERSION__,
+    openExternal: (url) => ipcRenderer.send('app:openExternal', url),
+    onBeforeClose: (cb) => {
+      ipcRenderer.on('app:beforeClose', () => {
+        void cb()
+          .catch(() => undefined)
+          .finally(() => ipcRenderer.send('app:flushed'))
+      })
+    }
   }
 }
 

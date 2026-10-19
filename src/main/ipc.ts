@@ -3,11 +3,15 @@
  * wrapper over storage / importer / exporter. Later milestones register `ai:*`, `audio:*`, `pdf:*` here.
  */
 import { BrowserWindow, dialog, ipcMain, shell } from 'electron'
+import { askAi, cancelAi } from './ai/bridge'
+import { addImageFromPath, pickImages, pickPdf, writeAsset } from './assets'
 import { claudeStatus } from './claude'
-import { exportPdf, exportQuill } from './exporter'
+import { loadElements, saveElements } from './elements'
+import { exportImages, exportMarkdown, exportPdf, exportQuill, printDoc, showFile } from './exporter'
 import { IMAGE_FILTERS, IMPORT_FILTERS, Importer, syncFolderHint } from './importer'
 import { loadSettings, updateSettings } from './settings'
 import { LibraryStorage } from './storage'
+import type { AiRequest, ElementCollection, ExportPayload } from '@shared/api'
 import type { ImportResult, NewDocOptions, QuillDoc, Settings } from '@shared/types'
 
 export interface MainContext {
@@ -63,7 +67,6 @@ export function registerIpc(ctx: MainContext): void {
   h('library:setCover', async (_e, id: string, cover: string) => ({ items: await ctx.storage.setCover(id, cover) }))
   h('library:readDoc', (_e, id: string) => ctx.storage.readDoc(id))
   h('library:saveDoc', async (_e, doc: QuillDoc) => ({ items: await ctx.storage.saveDoc(doc) }))
-  h('library:exportPdf', (_e, id: string) => exportPdf(ctx.storage, id, ctx.window()))
   h('library:exportQuill', (_e, id: string) => exportQuill(ctx.storage, id, ctx.window()))
   ipcMain.on('library:showInFolder', (_e, id: string) => {
     const it = ctx.storage.items.find((i) => i.id === id)
@@ -92,6 +95,29 @@ export function registerIpc(ctx: MainContext): void {
     if (pick.canceled || !pick.filePaths[0]) return { ...items(), imported: [], skipped: [] }
     return ctx.importer.importDirectory(pick.filePaths[0], parentId)
   })
+
+  // ── document assets ──
+  h('doc:writeAsset', (_e, id: string, name: string, data: Uint8Array) => writeAsset(ctx.storage, id, name, data))
+  h('doc:pickImages', (_e, id: string) => pickImages(ctx.storage, id, ctx.window()))
+  h('doc:addImageFromPath', (_e, id: string, path: string) => addImageFromPath(ctx.storage, id, path))
+  h('doc:pickPdf', (_e, id: string) => pickPdf(ctx.storage, id, ctx.window()))
+
+  // ── export ──
+  h('export:pdf', (_e, payload: ExportPayload) => exportPdf(ctx.storage, payload, ctx.window()))
+  h('export:print', (_e, payload: ExportPayload) => printDoc(ctx.storage, payload))
+  h('export:images', (_e, title: string, files: { name: string; data: Uint8Array }[]) => exportImages(title, files, ctx.window()))
+  h('export:markdown', (_e, title: string, text: string) => exportMarkdown(title, text, ctx.window()))
+  ipcMain.on('export:showFile', (_e, path: string) => showFile(path))
+
+  // ── AI (local Claude Code) ──
+  h('ai:ask', (e, req: AiRequest) => {
+    void askAi(req, e.sender)
+  })
+  ipcMain.on('ai:cancel', (_e, id: string) => cancelAi(id))
+
+  // ── elements library ──
+  h('elements:get', () => loadElements())
+  h('elements:set', (_e, cols: ElementCollection[]) => saveElements(cols))
 
   // ── integrations ──
   h('claude:status', async () => claudeStatus((await loadSettings()).claudePath))
