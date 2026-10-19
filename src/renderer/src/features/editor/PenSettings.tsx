@@ -14,9 +14,10 @@ function previewPoints(): number[] {
   const pts: number[] = []
   for (let i = 0; i <= 60; i++) {
     const t = i / 60
-    const x = 20 + t * 240
-    const y = 70 - Math.sin(t * Math.PI * 1.15 - 0.35) * 38
-    pts.push(x, y, 0.35 + 0.5 * Math.sin(t * Math.PI))
+    const x = 24 + t * 232
+    // a soft tilde: dip, rise to a crest, fall away
+    const y = 62 - Math.sin(Math.PI * (1.7 * t - 0.45)) * 34
+    pts.push(x, y, 0.3 + 0.55 * Math.sin(t * Math.PI))
   }
   return pts
 }

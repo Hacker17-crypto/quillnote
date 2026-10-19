@@ -19,7 +19,9 @@ const api: QuillApi = {
   settings: {
     get: () => call('settings:get'),
     set: (patch) => call('settings:set', patch),
-    pickLibraryFolder: () => call('settings:pickLibraryFolder')
+    pickLibraryFolder: () => call('settings:pickLibraryFolder'),
+    pickFolder: (title) => call('settings:pickFolder', title),
+    pickFile: (title) => call('settings:pickFile', title)
   },
   library: {
     list: () => call('library:list'),
@@ -40,7 +42,8 @@ const api: QuillApi = {
     showInFolder: (id) => ipcRenderer.send('library:showInFolder', id),
     pickImport: (parentId, mode) => call('library:pickImport', parentId, mode),
     importPaths: (paths, parentId) => call('library:importPaths', paths, parentId),
-    importFolder: (parentId, hint) => call('library:importFolder', parentId, hint)
+    importFolder: (parentId, hint) => call('library:importFolder', parentId, hint),
+    searchContent: (query) => call('library:searchContent', query)
   },
   pathForFile: (file) => webUtils.getPathForFile(file),
   claude: { status: () => call('claude:status') },

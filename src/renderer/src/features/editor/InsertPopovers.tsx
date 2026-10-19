@@ -11,6 +11,7 @@ import { GIF_STICKERS, STARTER_ELEMENTS, STICKER_PACKS, type StickerDef } from '
 import { marketStickers } from '../library/marketplace'
 
 const RECENT_KEY = 'qn-recent-stickers'
+const NONE: string[] = []
 
 function readRecent(): string[] {
   try {
@@ -22,7 +23,7 @@ function readRecent(): string[] {
 
 export function StickersPopover({ docId, anchor, onClose }: { docId: string; anchor: PopoverAnchor; onClose: () => void }): JSX.Element {
   const [tab, setTab] = useState<'stickers' | 'gifs'>('stickers')
-  const owned = useUi((s) => s.settings?.owned ?? [])
+  const owned = useUi((s) => s.settings?.owned ?? NONE)
   const packs = useMemo(() => [...STICKER_PACKS, ...marketStickers(owned)], [owned])
   const [pack, setPack] = useState<string>(() => (readRecent().length ? 'recent' : packs[0].id))
   const all = useMemo(() => [...packs.flatMap((p) => p.items), ...GIF_STICKERS], [packs])

@@ -239,8 +239,9 @@ export interface Settings {
   /** Main toolbar order and hidden tools. */
   toolbar?: { order: string[]; hidden: string[] }
   gestures?: { doubleTapEraser: boolean; scribbleErase: boolean; drawAndHold: boolean; circleLasso: boolean }
-  /** Marketplace items the user added (ids). */
+  /** Marketplace items the user added (ids), and the ones they hearted. */
   owned?: string[]
+  liked?: string[]
   /** Folder for automatic .quill backups ('' = off). */
   backupFolder?: string
   profileName?: string

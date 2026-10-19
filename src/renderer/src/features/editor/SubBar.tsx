@@ -1,5 +1,5 @@
 /** Floating sub-toolbar under the main toolbar: options for the active tool. */
-import { useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AlignCenter, AlignLeft, AlignRight, Bold, ChevronDown, Italic, List, ListChecks, ListOrdered, Minus, Plus, Strikethrough, Underline } from 'lucide-react'
 import { Menu, MenuItem, Popover, Slider, Toggle } from '../../components/kit'
 import { session, useEditor, useSession } from '../../stores/editor'
@@ -185,7 +185,6 @@ function EraserBar(): JSX.Element {
   const patch = useTools((s) => s.patch)
   const [menu, setMenu] = useState<Anchor>(null)
   const [filters, setFilters] = useState<Anchor>(null)
-  const filterBtn = useRef<HTMLButtonElement>(null)
   const set = (p: Partial<typeof e>): void => patch({ eraser: { ...useTools.getState().eraser, ...p } })
   const MODE = { standard: 'Standard', precise: 'Precise', stroke: 'Stroke eraser' }
   return (
@@ -196,9 +195,7 @@ function EraserBar(): JSX.Element {
         <ChevronDown size={14} strokeWidth={2.2} />
       </button>
       <Btn on={Object.values(e.filters).some((v) => !v)} chip="dark" label="Erase only…" onClick={(ev) => setFilters(ev.currentTarget)}>
-        <span ref={filterBtn as never}>
-          <FilterIcon size={21} />
-        </span>
+        <FilterIcon size={21} />
       </Btn>
       <Sep />
       {ERASER_SIZES.map((px, i) => (
@@ -229,17 +226,17 @@ function EraserBar(): JSX.Element {
           ))}
         </Popover>
       )}
-      {!e.tipSeen && <EraserTip onDone={() => set({ tipSeen: true })} anchor={filterBtn.current} />}
+      {!e.tipSeen && <EraserTip onDone={() => set({ tipSeen: true })} />}
     </>
   )
 }
 
-function EraserTip({ onDone, anchor }: { onDone: () => void; anchor: HTMLElement | null }): JSX.Element | null {
-  const [ready, setReady] = useState(false)
-  if (!ready) {
-    requestAnimationFrame(() => setReady(true))
-    return null
-  }
+function EraserTip({ onDone }: { onDone: () => void }): JSX.Element | null {
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null)
+  useEffect(() => {
+    const t = window.setTimeout(() => setAnchor(document.querySelector<HTMLElement>('.editor-host:not([hidden]) .subbar')), 50)
+    return () => window.clearTimeout(t)
+  }, [])
   if (!anchor) return null
   return (
     <Popover anchor={anchor} onClose={onDone} side="bottom" align="center" caret className="tip-pop">
@@ -297,11 +294,13 @@ function TextBar({ docId }: { docId: string }): JSX.Element {
   const t = useTools((s) => s.text)
   const patch = useTools((s) => s.patch)
   const editing = useSession(docId, (s) => s.editing)
-  const box = useSession(docId, (s) => {
+  const boxObj = useSession(docId, (s) => {
     if (!s.editing) return null
-    for (const p of s.doc.pages) for (const o of p.objects) if (o.id === s.editing && o.type === 'text') return { o, pageId: p.id }
+    for (const p of s.doc.pages) for (const o of p.objects) if (o.id === s.editing && o.type === 'text') return o
     return null
   })
+  const boxPage = useSession(docId, (s) => (s.editing ? s.doc.pages.find((p) => p.objects.some((o) => o.id === s.editing))?.id ?? null : null))
+  const box = boxObj && boxPage ? { o: boxObj, pageId: boxPage } : null
   const [fontMenu, setFontMenu] = useState<Anchor>(null)
   const [colorPop, setColorPop] = useState<{ anchor: Anchor; target: 'text' | 'bg' } | null>(null)
   const font = box?.o.font ?? t.font

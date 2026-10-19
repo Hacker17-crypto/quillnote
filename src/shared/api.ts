@@ -117,6 +117,8 @@ export interface QuillApi {
     get(): Promise<Settings>
     set(patch: Partial<Settings>): Promise<Settings>
     pickLibraryFolder(): Promise<Settings | null>
+    pickFolder(title: string): Promise<string | null>
+    pickFile(title: string): Promise<string | null>
   }
   library: {
     list(): Promise<LibraryItem[]>
@@ -138,6 +140,7 @@ export interface QuillApi {
     pickImport(parentId: string | null, mode: 'files' | 'images'): Promise<ImportResult>
     importPaths(paths: string[], parentId: string | null): Promise<ImportResult>
     importFolder(parentId: string | null, hint?: string): Promise<ImportResult>
+    searchContent(query: string): Promise<{ id: string; page: number; snippet: string }[]>
   }
   /** Resolve an OS drag-and-drop File to a filesystem path. */
   pathForFile(file: File): string

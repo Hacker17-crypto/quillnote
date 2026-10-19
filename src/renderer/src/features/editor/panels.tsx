@@ -3,7 +3,7 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { Bookmark, BookmarkCheck, ChevronDown, Copy, LayoutGrid, List, ListTree, MoreHorizontal, Pause, Play, Plus, RotateCw, Sparkles, Trash2, X, Loader2, Mic } from 'lucide-react'
 import type { PageData } from '@shared/types'
 import { EmptyState, Menu, MenuItem, MenuSeparator } from '../../components/kit'
-import { session, useEditor, useSession, type SearchHit } from '../../stores/editor'
+import { session, useEditor, useSession, type DocSession, type SearchHit } from '../../stores/editor'
 import { useUi } from '../../stores/ui'
 import { addPage, deletePage, duplicatePage, goToPage, movePage, patchPage, rotatePage, toggleBookmark } from './actions'
 import { PageBackground } from './PageSurface'
@@ -426,8 +426,9 @@ export function SearchPanel({ docId }: { docId: string }): JSX.Element {
 }
 
 // ───────────────────────── Recordings ─────────────────────────
+const NO_RECS: NonNullable<DocSession['doc']['recordings']> = []
 export function RecordingsPanel({ docId }: { docId: string }): JSX.Element {
-  const recs = useSession(docId, (s) => s.doc.recordings ?? [])
+  const recs = useSession(docId, (s) => s.doc.recordings ?? NO_RECS)
   const recording = useSession(docId, (s) => !!s.recording)
   const jobs = useAudioJobs((s) => s.jobs)
   const [open, setOpen] = useState<string | null>(recs[recs.length - 1]?.id ?? null)

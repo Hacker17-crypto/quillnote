@@ -46,6 +46,8 @@ export const useAiChat = create<ChatState>((set) => ({
 }))
 
 const calls = new Map<string, AiCall>()
+const NO_MSGS: Msg[] = []
+const NO_CARDS: Flashcard[] = []
 export const useStudy = create<{ docId: string | null; open: (id: string | null) => void }>((set) => ({ docId: null, open: (docId) => set({ docId }) }))
 
 const SCOPE_LABEL: Record<Scope, string> = { page: 'This page', document: 'This document', selection: 'Selection' }
@@ -142,7 +144,7 @@ const EXAMPLES: { label: string; kind: AiKind; prompt: string; scope: Scope }[] 
 ]
 
 export function AiPanel({ docId, floating, onToggleFloat }: { docId: string; floating: boolean; onToggleFloat: () => void }): JSX.Element {
-  const msgs = useAiChat((s) => s.chats[docId] ?? [])
+  const msgs = useAiChat((s) => s.chats[docId] ?? NO_MSGS)
   const hasSelection = useSession(docId, (s) => !!s.selection)
   const cards = useSession(docId, (s) => s.doc.flashcards?.length ?? 0)
   const [input, setInput] = useState('')
@@ -345,7 +347,7 @@ const BOX_DAYS = [0, 1, 3, 7, 16, 35]
 
 export function StudyOverlay(): JSX.Element | null {
   const docId = useStudy((s) => s.docId)
-  const cards = useSession(docId ?? '', (s) => s.doc.flashcards ?? [])
+  const cards = useSession(docId ?? '', (s) => s.doc.flashcards ?? NO_CARDS)
   const [queue, setQueue] = useState<string[]>([])
   const [flipped, setFlipped] = useState(false)
   const [done, setDone] = useState(0)

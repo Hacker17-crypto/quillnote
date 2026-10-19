@@ -285,6 +285,8 @@ export const PageSurface = memo(function PageSurface({ docId, page, index, width
     const svg = svgRef.current
     const live = liveRef.current
     if (!svg || !live) return
+    // Keep focus where tools put it (new text boxes, sticky notes) and stop text selection.
+    e.preventDefault()
 
     const tb = target.closest('[data-tb]')
     const s = session(docId)
