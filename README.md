@@ -1,73 +1,65 @@
 # Quillnote
 
-A desktop handwriting and note-taking app for **Windows and macOS**, built with Electron, React and TypeScript.
+Quillnote is an early desktop notebook-library preview for Windows and macOS.
 
-Quillnote is a clean-room re-implementation of the layout and flows of GoodNotes — every "premium" feature is unlocked, there is no paywall, no "Unlock" labels and no lock icons. All AI features run through your **local Claude Code CLI**; no cloud API key is required and no data leaves the machine.
+**The page editor is still a placeholder.** Handwriting, annotation, audio recording,
+and AI assistance are planned features, not working features in this release.
 
-![Quillnote](https://img.shields.io/badge/Electron-44-47848F?style=flat-square) ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square) ![License](https://img.shields.io/badge/license-UNLICENSED-lightgrey?style=flat-square)
+## What works now
 
-## Features
+- Create notebooks and folders, choose paper templates and covers.
+- Rename, duplicate, move, favorite, trash, and restore library items.
+- Save the library locally and reopen it after restarting the app.
+- Import documents and export PDF or `.quill` files through the library menus.
+- Library search, sorting, selection, appearance settings, and document tabs.
 
-- **Library** — documents grid, folders, notebooks with procedurally generated paper templates and original covers, sort, multi-select, favourites, trash, and everything persisted to disk.
-- **Editor** — tabbed notebooks, custom title bar, page thumbnails sidebar, zoom, add-page popover, share/export popover and per-page menus.
-- **Ink engine** — fountain, ball and brush pens with pressure support, highlighter, three eraser modes, colour picker, stroke widths, draw-and-hold shapes, ruler and laser pointer.
-- **Objects** — lasso select, text boxes, images, sticky notes, an original elements library, audio recording and local transcription.
-- **Documents** — PDF import/annotate/export, image and Markdown export, print, `.quill` import/export, whiteboard, text documents and quick notes.
-- **Search & AI** — in-document and library search, AI panel with ten AI features, and handwriting playback of recorded audio.
+## Downloads
 
-## Requirements
+Use the [GitHub releases page](https://github.com/Hacker17-crypto/quillnote/releases).
+Windows downloads end in `.exe`; Mac downloads end in `arm64.dmg` for Apple Silicon
+or `x64.dmg` for Intel. These preview builds are not developer-signed or notarized.
 
-- Node.js 20+ (24 recommended)
-- The [Claude Code CLI](https://claude.com/claude-code) installed and signed in — only needed for the AI features.
+## Development
 
-## Getting started
+Install Node.js 24, then run these commands from the folder containing this file:
 
-```bash
-npm install
-npm run dev        # run the app in development
+```sh
+npm ci
+npm run dev
 ```
 
-## Scripts
+Opening `src/renderer/index.html` directly in a browser does not run the desktop app.
+It requires Electron's preload bridge and the compiled application.
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Start the app with hot reload |
-| `npm run typecheck` | Type-check main, preload and renderer projects |
-| `npm run build` | Type-check and bundle to `out/` |
-| `npm run start` | Preview the production build |
-| `npm run dist:win` | Build the Windows NSIS installer into `release/` |
-| `npm run dist:mac` | Build the macOS disk images into `release/` |
+## Checks and packaging
 
-## Storage
-
-Everything is stored locally in `~/Quillnote/` (configurable in Settings). One folder per document:
-
-```
-doc.json     metadata, pages and vector objects
-assets/      images, audio and imported PDFs
+```sh
+npm run build
+npm run test:persistence
+npm run dist:win
+# On a Mac:
+npm run dist:mac
 ```
 
-The library index lives in `library.json`. Saves are debounced (500 ms). There is no account and no cloud sync.
+Installers are written to `release/`. Packaging restores the original PNG from
+`build/icon.png.base64` and verifies its SHA-256 checksum. The original vector
+artwork is also preserved in `build/icon.svg`.
+The restart test uses an isolated temporary library, checks saved content, and
+removes its own test data. Set `QN_EXECUTABLE` to test a packaged executable.
 
-## Project layout
+The GitHub workflow installs locked dependencies with `npm ci`, builds Windows
+and both Mac architectures, checks the Windows packaged app, and only publishes
+when all three installers exist. Existing published releases are preserved.
 
-```
-src/
-  main/        Electron main process — window, storage, import/export, AI bridge
-  preload/     context bridge API exposed to the renderer
-  renderer/    React UI (library, editor, component kit, styles)
-  shared/      types and helpers shared by both processes
-scripts/       screenshot and persistence-check helpers
-```
+## Your data
 
-## Releases
-
-Pushes to `main` run the `Build and release` GitHub Actions workflow, which produces a Windows
-installer (`.exe`) and macOS disk images (`.dmg`) and publishes them on the
-[Releases page](https://github.com/<owner>/quillnote/releases). Builds are unsigned — on macOS,
-right-click the app and choose **Open** the first time.
+The default library is `~/Quillnote/`, separate from this source folder.
+The index is `library.json`; each document lives at
+`documents/<id>/doc.json` with an `assets/` directory beside it.
+Settings are stored in Electron's user-data directory.
+Keep a separate backup of your notebooks; the source repository is not a backup
+of your personal library. The current Claude integration only detects the CLI.
 
 ## License
 
-UNLICENSED. All artwork, icons, covers, paper templates and marketplace items in this repository
-are original and created in code — no third-party assets are bundled.
+UNLICENSED. Third-party packages retain their respective licenses.

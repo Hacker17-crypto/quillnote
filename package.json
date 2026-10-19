@@ -13,8 +13,10 @@
     "build": "npm run typecheck && electron-vite build",
     "start": "electron-vite preview",
     "shots": "node scripts/shoot.mjs",
-    "dist:win": "npm run build && electron-builder --win --x64 --publish never",
-    "dist:mac": "npm run build && electron-builder --mac --publish never"
+    "test:persistence": "node scripts/persist-check.mjs",
+    "icon": "node scripts/make-icon.cjs",
+    "dist:win": "npm run build && npm run icon && electron-builder --win --x64 --publish never",
+    "dist:mac": "npm run build && npm run icon && electron-builder --mac --publish never"
   },
   "build": {
     "appId": "app.quillnote.desktop",

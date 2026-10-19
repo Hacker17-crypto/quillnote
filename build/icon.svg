@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="g" x1="0.08" y1="0.05" x2="0.92" y2="0.95">
+      <stop offset="0" stop-color="#5EEAD4"/>
+      <stop offset="0.45" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1024" height="1024" rx="230" fill="url(#g)"/>
+  <rect x="0" y="0" width="1024" height="1024" rx="230" fill="url(#sheen)"/>
+
+  <!-- quill nib -->
+  <g fill="#ffffff" fill-rule="evenodd">
+    <path d="M 706 246
+             C 772 372, 700 552, 528 648
+             C 438 698, 360 704, 300 718
+             C 316 632, 340 556, 378 478
+             C 446 342, 562 252, 706 246 Z
+             M 312 706 L 548 452 L 574 474 L 340 712 Z
+             M 596 330 a 28 28 0 1 0 0.1 0 Z"/>
+  </g>
+
+  <!-- ink drop accent -->
+  <circle cx="300" cy="718" r="26" fill="#ffffff"/>
+</svg>
