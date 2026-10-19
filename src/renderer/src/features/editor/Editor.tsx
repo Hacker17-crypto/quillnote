@@ -194,7 +194,9 @@ function SelectionMenu({ docId }: { docId: string }): JSX.Element | null {
       const q = new DOMPoint(b.x, b.y + b.h).matrixTransform(m)
       const hr = host.getBoundingClientRect()
       const above = p.y - hr.top > 120
-      setPos({ x: p.x - hr.left, y: above ? p.y - hr.top - 18 : q.y - hr.top + 18 })
+      const x = Math.round(p.x - hr.left)
+      const y = Math.round(above ? p.y - hr.top - 18 : q.y - hr.top + 18)
+      setPos((cur) => (cur && cur.x === x && cur.y === y ? cur : { x, y }))
     }
     const loop = (): void => {
       place()
@@ -367,6 +369,7 @@ function CropDialog({ docId, img, onClose }: { docId: string; img: ImageObject; 
     <Dialog open onClose={onClose} width={560} label="Crop image">
       <div className="small-dialog">
         <h3>Crop</h3>
+        <div className="crop-wrap">
         <div className="crop-stage" ref={box}>
           <img src={assetUrl(docId, img.asset)} alt="" draggable={false} />
           <div className="crop-rect" style={{ left: `${c.x * 100}%`, top: `${c.y * 100}%`, width: `${c.w * 100}%`, height: `${c.h * 100}%` }} onPointerDown={drag('move')}>
@@ -374,6 +377,7 @@ function CropDialog({ docId, img, onClose }: { docId: string; img: ImageObject; 
               <span key={h} className={`crop-h ${h}`} onPointerDown={(e) => { e.stopPropagation(); drag(h)(e) }} />
             ))}
           </div>
+        </div>
         </div>
       </div>
       <DialogFooter>
@@ -390,15 +394,28 @@ function RulerOverlay(): JSX.Element | null {
   const on = useTools((s) => s.ruler)
   const st = useSyncExternalStore(ruler.subscribe, () => ruler.state)
   const ref = useRef<HTMLDivElement>(null)
+  const [host, setHost] = useState<DOMRect | null>(null)
+
+  // Track the canvas rectangle; put the ruler in the middle when it is off-screen.
   useEffect(() => {
-    if (!on || ruler.placed) return
-    const host = ref.current?.parentElement?.getBoundingClientRect()
-    if (host) ruler.set({ cx: host.left + host.width / 2, cy: host.top + host.height / 2, angle: 0 })
+    const el = ref.current?.parentElement
+    if (!on || !el) return
+    const measure = (): void => {
+      const r = el.getBoundingClientRect()
+      if (!r.width) return
+      setHost(r)
+      const { cx, cy } = ruler.state
+      if (!ruler.placed || cx < r.left || cx > r.right || cy < r.top || cy > r.bottom) ruler.set({ cx: r.left + r.width / 2, cy: r.top + r.height / 2 })
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [on])
   useEffect(() => {
     if (!on) return
     const onWheel = (e: WheelEvent): void => {
-      if (!e.altKey) return
+      if (!e.altKey || !ref.current?.offsetParent) return
       e.preventDefault()
       ruler.set({ angle: ruler.state.angle + (e.deltaY > 0 ? 1 : -1) * (Math.PI / 180) * (e.shiftKey ? 15 : 1) })
     }
@@ -406,7 +423,7 @@ function RulerOverlay(): JSX.Element | null {
     return () => window.removeEventListener('wheel', onWheel)
   }, [on])
   if (!on) return null
-  const host = ref.current?.parentElement?.getBoundingClientRect() ?? { left: 0, top: 0 }
+  if (!host) return <div ref={ref} className="ruler-layer" />
   const deg = Math.round(((((st.angle * 180) / Math.PI) % 360) + 360) % 360)
   const shown = deg > 180 ? 360 - deg : deg
   const dragMove = (e: React.PointerEvent): void => {

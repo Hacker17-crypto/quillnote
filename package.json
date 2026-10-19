@@ -57,6 +57,7 @@
       "category": "public.app-category.productivity",
       "icon": "build/icon.png",
       "identity": null,
+      "extendInfo": { "NSMicrophoneUsageDescription": "Quillnote records audio for Record & Summarize." },
       "artifactName": "Quillnote-${version}-${arch}.${ext}"
     }
   },

@@ -177,12 +177,13 @@ async function fontFaces(): Promise<string> {
 }
 
 async function buildHtml(storage: LibraryStorage, payload: ExportPayload, forPrint: boolean): Promise<string> {
-  const base = `html,body{margin:0;padding:0;background:#fff}*{box-sizing:border-box}svg{display:block}
+  // Transparent page background so annotation layers can be stamped over original PDF pages.
+  const base = `html,body{margin:0;padding:0;background:transparent}*{box-sizing:border-box}svg{display:block}
 .qn-text{font-family:Figtree,'Segoe UI',sans-serif}`
   if (payload.flow !== undefined) {
     const body = await inlineAssets(storage, payload.flow)
     return `<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(payload.title)}</title><style>${await fontFaces()}${base}
-@page{size:A4;margin:56pt}body{font:12pt/1.55 Figtree,'Segoe UI',sans-serif;color:#111}
+@page{size:A4;margin:56pt}html,body{background:#fff}body{font:12pt/1.55 Figtree,'Segoe UI',sans-serif;color:#111}
 img{max-width:100%}h1{font-size:24pt}h2{font-size:18pt}h3{font-size:14pt}blockquote{border-left:3pt solid #ccc;margin-left:0;padding-left:12pt;color:#444}
 ul.qn-check{list-style:none;padding-left:4pt}pre,code{font-family:Consolas,Menlo,monospace}</style></head><body>${body}</body></html>`
   }

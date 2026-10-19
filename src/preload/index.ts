@@ -77,6 +77,7 @@ const api: QuillApi = {
   app: {
     version: __APP_VERSION__,
     openExternal: (url) => ipcRenderer.send('app:openExternal', url),
+    askMicrophone: () => call('app:askMicrophone'),
     onBeforeClose: (cb) => {
       ipcRenderer.on('app:beforeClose', () => {
         void cb()

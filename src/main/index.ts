@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, net, protocol, shell } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, net, protocol, session, shell, systemPreferences } from 'electron'
 import { join, normalize, sep } from 'path'
 import { pathToFileURL } from 'url'
 import { createContext, registerIpc, type MainContext } from './ipc'
@@ -89,6 +89,19 @@ app.whenReady().then(async () => {
     return
   }
   if (!isMac) Menu.setApplicationMenu(null)
+
+  // Microphone for Record & Summarize; everything else stays denied.
+  session.defaultSession.setPermissionRequestHandler((_wc, permission, cb, details) => {
+    if (permission === 'media') cb(!('mediaTypes' in details) || (details.mediaTypes ?? []).every((t) => t === 'audio'))
+    else if (permission === 'clipboard-read' || permission === 'clipboard-sanitized-write') cb(true)
+    else cb(false)
+  })
+  session.defaultSession.setPermissionCheckHandler((_wc, permission) => permission === 'media' || permission === 'clipboard-read' || permission === 'clipboard-sanitized-write')
+  ipcMain.handle('app:askMicrophone', async () => {
+    if (process.platform !== 'darwin') return true
+    if (systemPreferences.getMediaAccessStatus('microphone') === 'granted') return true
+    return systemPreferences.askForMediaAccess('microphone')
+  })
 
   const settings = await loadSettings()
   const storage = new LibraryStorage(settings.libraryRoot)

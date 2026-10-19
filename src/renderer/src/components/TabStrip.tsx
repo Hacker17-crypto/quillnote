@@ -98,7 +98,7 @@ function OpenPicker({ anchor, onClose }: { anchor: HTMLElement; onClose: () => v
   )
   return (
     <Popover anchor={anchor} onClose={onClose} side="bottom" align="end" className="open-picker">
-      <input autoFocus className="q-input" placeholder="Open a document…" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => {
+      <input data-autofocus className="q-input" placeholder="Open a document…" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => {
         e.stopPropagation()
         if (e.key === 'Enter' && list[0]) {
           openItem(list[0])

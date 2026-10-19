@@ -10,7 +10,7 @@ import { useUi } from '../../stores/ui'
 import { unionBounds, type Rect } from './geometry'
 import { htmlText, htmlToMd } from './markdown'
 import { pdfPagePng, pdfText } from './pdf'
-import { assetUrl, overlaySvg, svgDataUrl } from './render'
+import { assetUrl, overlaySvg, setRootAttrs, svgDataUrl } from './render'
 
 export interface ExportOptions {
   /** Page indices to include (default: all). */
@@ -133,14 +133,14 @@ export async function rasterPage(doc: QuillDoc, page: PageData, pxWidth: number,
       if (page.background?.type === 'pdf') drawFull(await pdfPagePng(doc.id, page.background.asset, page.background.pdfPage ?? 0, Math.round(page.width * k)))
       else if (page.background?.type === 'image' && page.background.asset) drawFull(await loadImage(assetUrl(doc.id, page.background.asset)))
       else if (page.infinite) ctx.drawImage(await loadImage(svgDataUrl(dotsSvg(r))), 0, 0, c.width, c.height)
-      else drawFull(await loadImage(svgDataUrl(paperSvg(page.paper).replace('<svg ', `<svg width="${Math.round(page.width * k)}" height="${Math.round(page.height * k)}" preserveAspectRatio="none" `))))
+      else drawFull(await loadImage(svgDataUrl(setRootAttrs(paperSvg(page.paper), { width: String(Math.round(page.width * k)), height: String(Math.round(page.height * k)), preserveAspectRatio: 'none' }))))
     } catch {
       /* background unavailable: keep white */
     }
   }
   const hrefs = new Map<string, string>()
   for (const o of page.objects) if (o.type === 'image' && !hrefs.has(o.asset)) hrefs.set(o.asset, await toDataUrl(assetUrl(doc.id, o.asset)).catch(() => ''))
-  const svg = overlaySvg(page, doc.id, r, { hrefs }).replace(/width="[^"]*" height="[^"]*">/, `width="${c.width}" height="${c.height}">`)
+  const svg = setRootAttrs(overlaySvg(page, doc.id, r, { hrefs }), { width: String(c.width), height: String(c.height) })
   try {
     ctx.drawImage(await loadImage(svgDataUrl(svg)), 0, 0, c.width, c.height)
   } catch {

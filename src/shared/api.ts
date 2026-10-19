@@ -174,6 +174,8 @@ export interface QuillApi {
   app: {
     version: string
     openExternal(url: string): void
+    /** macOS: ask the system for microphone access (resolves true elsewhere). */
+    askMicrophone(): Promise<boolean>
     /** Main asks the renderer to flush unsaved work before the window closes. */
     onBeforeClose(cb: () => Promise<void>): void
   }

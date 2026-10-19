@@ -34,9 +34,15 @@ export async function startRecording(docId: string): Promise<void> {
   }
   let stream: MediaStream
   try {
+    if (!(await window.quill.app.askMicrophone())) throw new DOMException('denied', 'NotAllowedError')
     stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } })
-  } catch {
-    toast('Microphone access was denied. Allow it in your system privacy settings and try again.')
+  } catch (e) {
+    const name = e instanceof DOMException ? e.name : ''
+    toast(
+      name === 'NotFoundError' || name === 'OverconstrainedError'
+        ? 'No microphone was found. Connect one and try again.'
+        : 'Microphone access was denied. Allow Quillnote in your system privacy settings and try again.'
+    )
     return
   }
   const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : 'audio/webm'

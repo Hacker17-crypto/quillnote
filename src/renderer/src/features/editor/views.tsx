@@ -156,6 +156,7 @@ export function NotebookView({ docId, active }: { docId: string; active: boolean
   useLayoutEffect(() => {
     const el = ref.current
     const before = prevZoom.current
+    if (!zoom) return
     prevZoom.current = zoom
     if (!el || !before || before === zoom) return
     const a = anchors.get(docId) ?? { x: el.clientWidth / 2, y: el.clientHeight / 2 }
@@ -289,6 +290,7 @@ export function WhiteboardView({ docId }: { docId: string }): JSX.Element {
 
   useLayoutEffect(() => {
     const before = prevZoom.current
+    if (!zoom) return
     prevZoom.current = zoom
     if (!before || before === zoom || !size.w) return
     const a = anchors.get(docId) ?? { x: size.w / 2, y: size.h / 2 }

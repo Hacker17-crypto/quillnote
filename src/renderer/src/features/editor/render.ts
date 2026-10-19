@@ -69,6 +69,15 @@ export function imageSvg(o: ImageObject, docId: string, href?: string): string {
   return `<g${rot} opacity="${o.opacity ?? 1}"><svg x="${n(o.x)}" y="${n(o.y)}" width="${n(o.w)}" height="${n(o.h)}" viewBox="${c.x} ${c.y} ${c.w} ${c.h}" preserveAspectRatio="none" overflow="hidden"><image href="${esc(href ?? assetUrl(docId, o.asset))}" x="0" y="0" width="1" height="1" preserveAspectRatio="none"/></svg></g>`
 }
 
+/** Replace attributes on an SVG string's root element (drops any existing ones of the same name). */
+export function setRootAttrs(svg: string, attrs: Record<string, string>): string {
+  return svg.replace(/^<svg\b([^>]*)>/, (_m, rest: string) => {
+    let a = rest
+    for (const k of Object.keys(attrs)) a = a.replace(new RegExp(`\\s${k}="[^"]*"`, 'g'), '')
+    return `<svg${a}${Object.entries(attrs).map(([k, v]) => ` ${k}="${v}"`).join('')}>`
+  })
+}
+
 export const svgDataUrl = (svg: string): string => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 
 export function stickerSvg(o: StickerObject): string {

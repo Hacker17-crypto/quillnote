@@ -11,7 +11,7 @@ import { useUi } from '../../stores/ui'
 import { bounds, type Rect } from './geometry'
 import { HIGHLIGHT_ALPHA } from './ink'
 import { pdfLinks, renderPdfPage, type PdfLink } from './pdf'
-import { assetUrl, layerOf, objectSvg, textStyle } from './render'
+import { assetUrl, layerOf, objectSvg, setRootAttrs, textStyle } from './render'
 import { selectionBounds, startGesture, type Gesture } from './tools'
 
 const paperCache = new Map<string, string>()
@@ -19,7 +19,7 @@ function paperMarkup(page: PageData): string {
   const key = JSON.stringify(page.paper)
   let svg = paperCache.get(key)
   if (!svg) {
-    svg = paperSvg(page.paper).replace('<svg ', '<svg preserveAspectRatio="none" style="width:100%;height:100%;display:block" ')
+    svg = setRootAttrs(paperSvg(page.paper), { preserveAspectRatio: 'none', width: '100%', height: '100%', style: 'display:block' })
     paperCache.set(key, svg)
   }
   return svg
