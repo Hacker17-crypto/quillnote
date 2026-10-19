@@ -1,17 +1,30 @@
 # Quillnote
 
-Quillnote is an early desktop notebook-library preview for Windows and macOS.
+Quillnote is a desktop handwriting and note-taking app for Windows and macOS.
 
-**The page editor is still a placeholder.** Handwriting, annotation, audio recording,
-and AI assistance are planned features, not working features in this release.
+## Features
 
-## What works now
-
-- Create notebooks and folders, choose paper templates and covers.
-- Rename, duplicate, move, favorite, trash, and restore library items.
-- Save the library locally and reopen it after restarting the app.
-- Import documents and export PDF or `.quill` files through the library menus.
-- Library search, sorting, selection, appearance settings, and document tabs.
+- **Library**: notebooks, folders, covers and paper templates; favorites, trash, sort, select, import and export,
+  search across titles and the text inside documents; marketplace of free planners, templates, covers and sticker packs.
+- **Editor**: tabs, pages sidebar (grid, list, bookmarks, outline), vertical or horizontal scrolling, zoom
+  (Ctrl+scroll, pinch, zoom pill), space-drag panning, page counter, undo/redo, read-only mode, autosave.
+- **Writing tools**: fountain, ball and brush pens with pressure (perfect-freehand), pen settings, highlighter,
+  tape, shapes (draw a rough shape or draw-and-hold), ruler, eraser (standard / precise / stroke, with
+  filters), lasso (free or rectangle: move, resize, recolour, cut/copy/paste, duplicate, screenshot,
+  add to Elements), text boxes with formatting, sticky notes, images (crop, rotate, opacity), stickers and
+  animated stickers, Elements library, laser pointer, alignment guides, scribble-to-erase.
+- **Documents**: notebooks, quick notes, infinite whiteboards, rich text documents, imported PDFs (rendered with
+  pdf.js, searchable, clickable links in read-only mode) and images.
+- **Pages**: add before/after/last from templates, images or PDF pages; duplicate, rotate, bookmark, outline,
+  change template, clear specific items, delete.
+- **Export**: PDF (annotations stamped onto the original PDF pages), PNG, Markdown, `.quill`, and print.
+- **AI** (through your local Claude Code CLI — no API key in the app): chat about a page, document or
+  selection; handwriting to text; summaries; spelling check; maths help; flashcards with a study mode;
+  diagrams created as SVG; smart search; title suggestions.
+- **Audio**: Record & Summarize with ink playback in sync with the recording. Transcription runs on-device
+  with Whisper (transformers.js); the model is downloaded once on first use, so that needs an internet connection.
+- **Settings**: theme, default paper and cover, stylus-only drawing, pen gestures, library location,
+  automatic `.quill` backups, Claude Code path.
 
 ## Downloads
 
@@ -58,7 +71,8 @@ The index is `library.json`; each document lives at
 `documents/<id>/doc.json` with an `assets/` directory beside it.
 Settings are stored in Electron's user-data directory.
 Keep a separate backup of your notebooks; the source repository is not a backup
-of your personal library. The current Claude integration only detects the CLI.
+of your personal library. AI features need Claude Code installed and signed in (`claude` on your PATH,
+or set its location in Settings › Preferences).
 
 ## License
 

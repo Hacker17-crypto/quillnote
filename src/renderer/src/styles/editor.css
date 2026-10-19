@@ -2196,3 +2196,30 @@ ul.qn-check > li[data-checked='true']::before {
   color: var(--text-3);
   font-size: 12px;
 }
+
+/* study overlay is always dark */
+.study {
+  color: #fff;
+}
+.study .q-btn.outline {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+.study .panel-x {
+  color: #fff;
+}
+
+/* light theme: grey canvas so pages stand out */
+[data-theme='light'] .ed-canvas,
+[data-theme='light'] .editor {
+  background: #e7e9ee;
+}
+[data-theme='light'] .pg-placeholder {
+  background: #fbfbf8;
+}
+[data-theme='light'] .side-panel {
+  background: #fff;
+}
+[data-theme='light'] .textdoc-page {
+  box-shadow: 0 4px 18px rgba(30, 40, 60, 0.12);
+}
