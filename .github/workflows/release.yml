@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     strategy:
@@ -25,13 +29,39 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: npm install
+          cache: npm
+
+      - name: Cache electron binaries
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/electron
+            ~/.cache/electron-builder
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+          key: electron-${{ matrix.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: electron-${{ matrix.os }}-
+
+      - run: npm ci
+
       - run: npm run ${{ matrix.script }}
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Verify installer was produced
+        shell: bash
+        run: |
+          ls -la release
+          test -n "$(ls release/*.exe 2>/dev/null || ls release/*.dmg 2>/dev/null)" || {
+            echo "No installer artifact found" >&2
+            exit 1
+          }
+
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
