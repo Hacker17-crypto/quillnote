@@ -8,7 +8,7 @@ import { useUi } from '../../stores/ui'
 import { svgDataUrl } from '../editor/render'
 import { PaperPreview } from './PaperTile'
 import { openById } from './actions'
-import { MARKET, type MarketCategory, type MarketItem } from './marketplace'
+import { MARKET, type MarketCategory, type MarketItem } from './marketCatalog'
 
 type Tab = MarketCategory | 'saved'
 const TABS: { id: Tab; label: string }[] = [
