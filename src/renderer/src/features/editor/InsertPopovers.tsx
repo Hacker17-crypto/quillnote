@@ -8,7 +8,7 @@ import { useUi } from '../../stores/ui'
 import { insertObjects, insertSticker } from './actions'
 import { overlaySvg, svgDataUrl } from './render'
 import { GIF_STICKERS, STARTER_ELEMENTS, STICKER_PACKS, type StickerDef } from './stickers'
-import { marketStickers } from '../library/marketplace'
+import { marketStickers } from '../library/marketCatalog'
 
 const RECENT_KEY = 'qn-recent-stickers'
 const NONE: string[] = []
