@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react'
 import { TabStrip } from './components/TabStrip'
 import { TitleBar } from './components/TitleBar'
 import { Toasts } from './components/Toasts'
-import { EditorPlaceholder } from './features/editor/EditorPlaceholder'
+import { Editor } from './features/editor/Editor'
+import { StudyOverlay } from './features/editor/AiPanel'
+import { laser } from './features/editor/laser'
+import { useEditor } from './stores/editor'
+import { initToolPersistence } from './stores/tools'
 import { DialogHost } from './features/library/Dialogs'
 import { LibraryPage } from './features/library/LibraryPage'
 import { Sidebar } from './features/library/Sidebar'
@@ -38,6 +42,7 @@ function useTheme(): void {
 
 function Shell(): JSX.Element {
   const active = useTabs((s) => s.active)
+  const tabs = useTabs((s) => s.tabs)
   const items = useLibrary((s) => s.items)
 
   // Close tabs whose document was trashed or deleted.
@@ -49,13 +54,23 @@ function Shell(): JSX.Element {
     }
   }, [items])
 
+  // Sessions whose tab went away (closed, or the document was trashed) are saved and released.
+  useEffect(() => {
+    const open = new Set(tabs.map((t) => t.id))
+    for (const id of Object.keys(useEditor.getState().sessions)) if (!open.has(id)) void useEditor.getState().close(id)
+  }, [tabs])
+
   return (
     <>
       <div className="lib-layout" hidden={active !== 'home'}>
         <Sidebar />
         <LibraryPage />
       </div>
-      {active !== 'home' && <EditorPlaceholder id={active} />}
+      {tabs.map((t) => (
+        <div key={t.id} className="editor-host" hidden={active !== t.id}>
+          <Editor docId={t.id} active={active === t.id} />
+        </div>
+      ))}
     </>
   )
 }
@@ -66,8 +81,13 @@ export function App(): JSX.Element {
   useTheme()
 
   useEffect(() => {
-    void window.quill.settings.get().then(useUi.getState().setSettings)
+    void window.quill.settings.get().then((s) => {
+      useUi.getState().setSettings(s)
+      initToolPersistence(s.tools)
+    })
     void useLibrary.getState().load()
+    // flush unsaved edits before the window closes
+    window.quill.app.onBeforeClose(() => useEditor.getState().flushAll())
   }, [])
 
   if (route.startsWith('/kit')) {
@@ -86,6 +106,8 @@ export function App(): JSX.Element {
       <TabStrip />
       <div className="app-main">{ready && <Shell />}</div>
       <DialogHost />
+      <StudyOverlay />
+      <canvas ref={laser.attach} className="laser-canvas" />
       <Toasts />
     </div>
   )

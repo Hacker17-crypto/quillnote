@@ -9,6 +9,10 @@ import { ItemCard } from './ItemCard'
 import { NewMenu } from './NewMenu'
 import { createAndOpen, currentParent, openItem } from './actions'
 import { breadcrumb, itemsFor } from './selectors'
+import { AccountPanel } from './Account'
+import { Marketplace } from './Marketplace'
+import { Thumbnail } from '../../components/Thumbnail'
+import { useEditor } from '../../stores/editor'
 
 const TITLES = { documents: 'Documents', favorites: 'Favorites', shared: 'Shared', marketplace: 'Marketplace', trash: 'Trash' } as const
 
@@ -26,6 +30,8 @@ export function LibraryPage(): JSX.Element {
   const [fileDrag, setFileDrag] = useState(false)
   const newClickTimer = useRef<number>(0)
   const searchRef = useRef<HTMLInputElement>(null)
+  const [account, setAccount] = useState(false)
+  const [contentHits, setContentHits] = useState<{ id: string; page: number; snippet: string }[]>([])
 
   const visible = useMemo(() => {
     const base = searching && query.trim() ? items.filter((i) => i.trashedAt === null && i.title.toLowerCase().includes(query.trim().toLowerCase())) : itemsFor(items, nav, folderId)
@@ -39,6 +45,14 @@ export function LibraryPage(): JSX.Element {
     if (searching) searchRef.current?.focus()
   }, [searching])
   useEffect(() => setFocusId(null), [nav, folderId])
+
+  // Search inside documents (typed text, sticky notes, recognised handwriting).
+  useEffect(() => {
+    const q = query.trim()
+    if (!searching || q.length < 2) return setContentHits([])
+    const t = window.setTimeout(() => void window.quill.library.searchContent(q).then(setContentHits).catch(() => setContentHits([])), 250)
+    return () => window.clearTimeout(t)
+  }, [searching, query, items])
 
   // ── interactions ──
   const onCardClick = useCallback(
@@ -181,17 +195,20 @@ export function LibraryPage(): JSX.Element {
   if (!loaded) body = <div className="lib-grid" />
   else if (nav === 'shared')
     body = <EmptyState art="shared" title="No shared documents" caption="Export a notebook as a Quillnote file from its menu to share it, or open a .quill file someone sent you with + New → Import." />
-  else if (nav === 'marketplace') body = <EmptyState art="search" title="Marketplace" caption="Templates, stickers and covers are coming in a later update." />
+  else if (nav === 'marketplace') body = <Marketplace />
+  else if (searching && query.trim() && contentHits.length) body = <SearchResults items={items} docs={visible} hits={contentHits} query={query.trim()} grid={(list) => grid(list)} />
   else if (!visible.length) {
     if (searching && query.trim()) body = <EmptyState art="search" title="No results" caption={`Nothing in your library matches “${query.trim()}”.`} />
     else if (nav === 'favorites')
       body = <EmptyState art="favorites" title="Find things quicker with Favorites" caption="Click ☆ to add documents or folders, or bookmark a page with 🔖" />
     else if (nav === 'trash') body = <EmptyState art="trash" title="Trash is empty" caption={`Deleted items stay here for ${TRASH_RETENTION_DAYS} days before they are removed.`} />
     else body = <EmptyState art="folder" title={folderId ? 'This folder is empty' : 'No documents yet'} caption="Click + New to create a notebook, whiteboard or quick note, or drop files here to import them." />
-  } else {
-    body = (
+  } else body = grid(visible)
+
+  function grid(list: LibraryItem[]): JSX.Element {
+    return (
       <div className={`lib-grid${settings?.view === 'list' ? ' list' : ''}`} onClick={(e) => e.target === e.currentTarget && setFocusId(null)}>
-        {visible.map((item) => (
+        {list.map((item) => (
           <ItemCard
             key={item.id}
             item={item}
@@ -233,7 +250,7 @@ export function LibraryPage(): JSX.Element {
         <IconButton label="Search" size={36} onClick={() => ui.setSearching(true)}>
           <Search size={22} strokeWidth={1.7} />
         </IconButton>
-        <IconButton label="Settings" size={36} onClick={() => ui.toast('Settings arrive in M8')}>
+        <IconButton label="Settings" size={36} onClick={() => setAccount(true)}>
           <Settings size={22} strokeWidth={1.7} />
         </IconButton>
       </div>
@@ -245,6 +262,56 @@ export function LibraryPage(): JSX.Element {
       {newAnchor && <NewMenu anchor={newAnchor} onClose={() => setNewAnchor(null)} />}
       {sortAnchor && <SortMenu anchor={sortAnchor} onClose={() => setSortAnchor(null)} />}
       {menu && <DocMenu item={menu.item} anchor={menu.anchor} onClose={() => setMenu(null)} />}
+      <AccountPanel open={account} onClose={() => setAccount(false)} />
     </main>
+  )
+}
+
+function SearchResults({ items, docs, hits, query, grid }: { items: LibraryItem[]; docs: LibraryItem[]; hits: { id: string; page: number; snippet: string }[]; query: string; grid: (l: LibraryItem[]) => JSX.Element }): JSX.Element {
+  const folders = docs.filter((d) => d.type === 'folder')
+  const files = docs.filter((d) => d.type !== 'folder')
+  const mark = (t: string): JSX.Element[] =>
+    t.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'ig')).map((p, i) => (p.toLowerCase() === query.toLowerCase() ? <mark key={i}>{p}</mark> : <span key={i}>{p}</span>))
+  const open = async (id: string, page: number): Promise<void> => {
+    const item = items.find((i) => i.id === id)
+    if (!item) return
+    openItem(item)
+    await useEditor.getState().open(id)
+    useEditor.getState().view(id, { jump: { page, nonce: Date.now() }, panel: 'search' })
+  }
+  return (
+    <div className="lib-results">
+      {files.length > 0 && (
+        <>
+          <h3 className="lib-res-h">Documents</h3>
+          {grid(files)}
+        </>
+      )}
+      <h3 className="lib-res-h">Handwriting &amp; typed text</h3>
+      <div className="lib-hits">
+        {hits.map((h, i) => {
+          const it = items.find((x) => x.id === h.id)
+          if (!it) return null
+          return (
+            <button key={i} type="button" className="lib-hit" onClick={() => void open(h.id, h.page)}>
+              <Thumbnail id={it.id} type={it.type} cover={it.cover} paper={it.paper} thumbAsset={it.thumbAsset} width={40} />
+              <span className="lib-hit-text">
+                <b>
+                  {it.title}
+                  {it.type !== 'text' && <span className="dim"> · page {h.page + 1}</span>}
+                </b>
+                <span>{mark(h.snippet)}</span>
+              </span>
+            </button>
+          )
+        })}
+      </div>
+      {folders.length > 0 && (
+        <>
+          <h3 className="lib-res-h">Folders</h3>
+          {grid(folders)}
+        </>
+      )}
+    </div>
   )
 }

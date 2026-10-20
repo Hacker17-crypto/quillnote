@@ -79,6 +79,12 @@ export function Popover({
     setPos({ left, top, side: s, caretX, caretY })
   }, [anchor, side, align, g, children])
 
+  // Inputs can't take focus while the popover is still hidden for measuring; focus once placed.
+  const placed = pos !== null
+  useEffect(() => {
+    if (placed) ref.current?.querySelector<HTMLElement>('[data-autofocus]')?.focus({ preventScroll: true })
+  }, [placed])
+
   useEffect(() => {
     const onDown = (e: PointerEvent): void => {
       const t = e.target as Node
